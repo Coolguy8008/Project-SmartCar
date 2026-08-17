@@ -3,6 +3,7 @@
 #include <vehicle.h>
 #include <ultrasonic.h>
 #include <ESP32Servo.h>
+#include <IRfunctions.h>
 
 #define IRpin 4
 #define leftLEDPin 2
@@ -11,10 +12,8 @@
 #define servoPin 25
 #define sonarPin 14
 #define echoPin 15
-#define antiClockwise Contrarotate
 
 IRrecv myIRrecv(IRpin);
-vehicle myCar;
 ultrasonic myUltrasonic;
 Servo myServo;
 
@@ -22,8 +21,6 @@ unsigned long lastCommandTime;            // Record the time of the last receive
 const unsigned long commandTimeout = 100; // Set the timeout period (milliseconds)
 uint32_t last_decode = 0;                 // Variable to store the previously decoded raw data
 uint32_t current_decode = 0;              // Variable to store the currently decoded raw data
-
-int SPEED = 200;
 
 int UT_distance = 0;
 // MOTOR TERMS (USE INSIDE OF "myCar.Move()") speed is out of 255
@@ -45,61 +42,8 @@ void setup()
 }
 
 // IR BUTTON FUNCTIONS
-void arrowLeft()
-{
-  myCar.Move(antiClockwise, SPEED);
-}
 
-void arrowRight()
-{
-  myCar.Move(Clockwise, SPEED);
-}
-
-void arrowUp()
-{
-  myCar.Move(Forward, SPEED);
-}
-
-void arrowDown()
-{
-  myCar.Move(Backward, SPEED);
-}
-
-void but1()
-{
-  myCar.Move(Move_Left, SPEED);
-}
-
-void but3()
-{
-  myCar.Move(Move_Right, SPEED);
-}
-
-// FOLLOW FUNCTIONS 
-
-void checkDistance()
-{
-  if (UT_distance > 60)
-  {
-    myCar.Move(Forward, SPEED);
-    // tone(buzzerPin, 0);
-  }
-  else
-  {
-    if (UT_distance < 40)
-    {
-      myCar.Move(Backward, SPEED);
-      // tone(buzzerPin, 0);
-    }
-    else
-    {
-      myCar.Move(Stop, 0);
-      //  tone(buzzerPin, 262);
-    }
-  }
-}
-
-// GENERAL CONTROL
+// FOLLOW FUNCTIONS
 
 void handleIRrecieve()
 {
@@ -139,6 +83,17 @@ void handleIRrecieve()
       but3();
       break;
 
+    case 0xE619FF00:
+      but2();
+      break;
+
+    case 0xBD42FF00:
+      faceObject();
+      break;
+
+            case 0xB54AFF00:
+      toggleFollow();
+      break;
     }
     last_decode = current_decode;
     // Update the stored previous decodedRawData
@@ -151,9 +106,34 @@ void handleIRrecieve()
   }
 }
 
+void checkDistance()
+{
+  if (UT_distance > 60)
+  {
+    myCar.Move(Forward, SPEED);
+    // tone(buzzerPin, 0);
+  }
+  else
+  {
+    if (UT_distance < 40)
+    {
+      myCar.Move(Backward, SPEED);
+      // tone(buzzerPin, 0);
+    }
+    else
+    {
+      myCar.Move(Stop, 0);
+      //  tone(buzzerPin, 262);
+    }
+  }
+}
+
 void loop()
 {
   UT_distance = myUltrasonic.Ranging();
+  if (followState = true){
+    checkDistance();
+  }
   handleIRrecieve();
   delay(250);
 }
