@@ -68,14 +68,16 @@ void toggleFollow()
 {
     if (manual == false)
     {
-    followState = !followState;
+        followState = !followState;
     }
 }
 
 void toggleManual()
 {
-    Serial.println(manual);
-    manual = !manual;
-    Serial.println(manual);
-
+    if (followState == false)
+    {
+        Serial.println(manual);
+        manual = !manual;
+        Serial.println(manual);
+    }
 }

@@ -110,6 +110,11 @@ void handleIRrecieve()
   }
 }
 
+void ledController(){
+  digitalWrite(leftLEDPin, manual);
+  digitalWrite(rightLEDPin, followState);
+}
+
 void checkDistance()
 {
   if (followState == true)
@@ -139,5 +144,6 @@ void loop()
   UT_distance = myUltrasonic.Ranging();
   checkDistance();
   handleIRrecieve();
+  ledController();
   delay(250);
 }
