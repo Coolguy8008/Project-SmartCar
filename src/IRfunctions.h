@@ -6,50 +6,76 @@ vehicle myCar;
 
 int SPEED = 200;
 bool followState = false;
-
-
+bool manual = false;
 
 void arrowLeft()
 {
-  myCar.Move(antiClockwise, SPEED);
+    if (manual)
+    {
+        myCar.Move(antiClockwise, SPEED);
+    }
 }
 
 void arrowRight()
 {
-  myCar.Move(Clockwise, SPEED);
+    if (manual)
+    {
+        myCar.Move(Clockwise, SPEED);
+    }
 }
 
 void arrowUp()
 {
-  myCar.Move(Forward, SPEED);
+    if (manual)
+    {
+        myCar.Move(Forward, SPEED);
+    }
 }
 
 void arrowDown()
 {
-  myCar.Move(Backward, SPEED);
+    if (manual)
+    {
+        myCar.Move(Backward, SPEED);
+    }
 }
 
 void but1()
 {
-  myCar.Move(Move_Left, SPEED);
+    if (manual)
+    {
+        myCar.Move(Move_Left, SPEED);
+    }
 }
 
 void but2()
 {
-
 }
 
 void but3()
 {
-  myCar.Move(Move_Right, SPEED);
+    if (manual)
+    {
+        myCar.Move(Move_Right, SPEED);
+    }
 }
 
 void faceObject()
 {
-
 }
 
 void toggleFollow()
 {
+    if (manual == false)
+    {
     followState = !followState;
+    }
+}
+
+void toggleManual()
+{
+    Serial.println(manual);
+    manual = !manual;
+    Serial.println(manual);
+
 }

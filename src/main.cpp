@@ -91,15 +91,19 @@ void handleIRrecieve()
       faceObject();
       break;
 
-            case 0xB54AFF00:
+    case 0xB54AFF00:
       toggleFollow();
+      break;
+
+    case 0xBF40FF00:
+      toggleManual();
       break;
     }
     last_decode = current_decode;
     // Update the stored previous decodedRawData
     myIRrecv.resume(); // Wait for the next IR signal
   }
-  if (millis() - lastCommandTime > commandTimeout)
+  if ((millis() - lastCommandTime > commandTimeout) & (manual))
   {
     myCar.Move(Stop, 0);
     // If no new IR signal within 100 milliseconds, stop the smart car
@@ -108,32 +112,32 @@ void handleIRrecieve()
 
 void checkDistance()
 {
-  if (UT_distance > 60)
+  if (followState == true)
   {
-    myCar.Move(Forward, SPEED);
-    // tone(buzzerPin, 0);
-  }
-  else
-  {
-    if (UT_distance < 40)
+    if (UT_distance > 60)
     {
-      myCar.Move(Backward, SPEED);
+      myCar.Move(Forward, SPEED);
       // tone(buzzerPin, 0);
     }
     else
     {
-      myCar.Move(Stop, 0);
-      //  tone(buzzerPin, 262);
+      if (UT_distance < 40)
+      {
+        myCar.Move(Backward, SPEED);
+        // tone(buzzerPin, 0);
+      }
+      else
+      {
+        myCar.Move(Stop, 0);
+        //  tone(buzzerPin, 262);
+      }
     }
   }
 }
-
 void loop()
 {
   UT_distance = myUltrasonic.Ranging();
-  if (followState = true){
-    checkDistance();
-  }
+  checkDistance();
   handleIRrecieve();
   delay(250);
 }
