@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <vehicle.h>
 #define antiClockwise Contrarotate
+#define buzzerPin 33
 
 vehicle myCar;
 
@@ -60,10 +61,6 @@ void but3()
     }
 }
 
-void faceObject()
-{
-}
-
 void toggleFollow()
 {
     if (manual == false)
@@ -76,8 +73,6 @@ void toggleManual()
 {
     if (followState == false)
     {
-        Serial.println(manual);
         manual = !manual;
-        Serial.println(manual);
     }
 }
