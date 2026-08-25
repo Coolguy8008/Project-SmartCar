@@ -76,3 +76,17 @@ void toggleManual()
         manual = !manual;
     }
 }
+
+void speedUp(){
+    SPEED +=10;
+    if (SPEED > 250) {
+        SPEED = 250;
+    }
+}
+
+void speedDown(){
+    SPEED-=10;
+    if (SPEED < 110) {
+        SPEED = 110;
+    }
+}

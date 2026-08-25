@@ -17,7 +17,7 @@
 int leftSide;
 int rightSide;
 int target;
-bool facingTarget=false;
+bool facingTarget = false;
 
 IRrecv myIRrecv(IRpin);
 ultrasonic myUltrasonic;
@@ -54,58 +54,80 @@ void findLeft()
 {
   while (facingTarget == false)
   {
-    myServo.write(90);
+
     UT_distance = myUltrasonic.Ranging();
     myCar.Move(antiClockwise, 200);
     Serial.println(UT_distance);
-    delay(100);
-    if ( (target-1) <= UT_distance <= (target+1)){
-      tone(buzzerPin, 255);
+    if (target - 3 <= UT_distance && target + 3 >= UT_distance)
+    {
       Serial.println("FOUND");
-      facingTarget=true;
+      facingTarget = true;
     }
+    delay(100);
   }
-  delay(500);
+  // delay(500);
   myCar.Move(Stop, 0);
-  tone(buzzerPin, 0);
 }
 void findRight()
 {
+  while (facingTarget == false)
+  {
+
+    UT_distance = myUltrasonic.Ranging();
+    myCar.Move(Clockwise, 200);
+    Serial.println(UT_distance);
+    if (target - 3 <= UT_distance && target + 3 >= UT_distance)
+    {
+      Serial.println("FOUND");
+      facingTarget = true;
+    }
+    delay(100);
+  }
+  // delay(500);
+  myCar.Move(Stop, 0);
 }
 
 void findClosest()
 {
   if ((followState == false) & (manual == false))
   {
+    // FIND RIGHT DISTANCE
     recieveInstruction = false;
     myServo.write(0);
     delay(300);
     rightSide = myUltrasonic.Ranging();
     Serial.print(rightSide);
     Serial.println(" RIGHT");
-
+    // FIND LEFT SIDE
     myServo.write(180);
     delay(400);
     leftSide = myUltrasonic.Ranging();
     Serial.print(leftSide);
     Serial.println(" LEFT");
+    // FIND LOWEST
     target = min(leftSide, rightSide);
     myServo.write(90);
-      delay(400);
+    delay(400);
     Serial.print("target: ");
     Serial.println(target);
     delay(500);
-    if (target == leftSide)
+    // CHOOSE FACE SIDE
+    if (target < 100)
     {
-      findLeft();
+      if (target == leftSide)
+      {
+        findLeft();
+      }
+      else
+      {
+        findRight();
+      }
     }
-    else
-    {
-      findRight();
-    }
+    // RESET
     leftSide = 0;
     rightSide = 0;
     recieveInstruction = true;
+    facingTarget = false;
   }
 }
 // IR BUTTON FUNCTIONS
@@ -165,12 +187,20 @@ void handleIRrecieve()
       case 0xBF40FF00:
         toggleManual();
         break;
+
+      case 0xF708FF00:
+        speedUp();
+        break;
+
+      case 0xA55AFF00:
+        speedDown();
+        break;
       }
       last_decode = current_decode;
       // Update the stored previous decodedRawData
       myIRrecv.resume(); // Wait for the next IR signal
     }
-    if ((millis() - lastCommandTime > commandTimeout) & (manual))
+    if ((millis() - lastCommandTime > commandTimeout) && (manual))
     {
       myCar.Move(Stop, 0);
       // If no new IR signal within 100 milliseconds, stop the smart car
@@ -214,5 +244,6 @@ void loop()
   checkDistance();
   handleIRrecieve();
   ledController();
+  Serial.println(SPEED);
   delay(250);
 }
