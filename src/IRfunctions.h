@@ -1,13 +1,4 @@
 #include <Arduino.h>
-#include <vehicle.h>
-#define antiClockwise Contrarotate
-#define buzzerPin 33
-
-vehicle myCar;
-
-int SPEED = 200;
-bool followState = false;
-bool manual = false;
 
 void arrowLeft()
 {
