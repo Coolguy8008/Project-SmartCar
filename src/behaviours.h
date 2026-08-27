@@ -12,7 +12,14 @@
 #define echoPin 15
 #define IrLeft 35
 #define IrRight 39
+#define antiClockwise Contrarotate
+#define buzzerPin 33
 
+vehicle myCar;
+
+int SPEED = 200;
+bool followState = false;
+bool manual = false;
 IRrecv myIRrecv(IRpin);
 ultrasonic myUltrasonic;
 Servo myServo;
