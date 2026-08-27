@@ -13,6 +13,3 @@ void setupWiFi() {
     Serial.print(".");
   }
 }
-
-
-
