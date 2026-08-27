@@ -1,7 +1,6 @@
 #include <vehicle.h>
 #include <ultrasonic.h>
 #include <ESP32Servo.h>
-#include <IRfunctions.h>
 
 #define IRpin 4
 #define leftLEDPin 2
