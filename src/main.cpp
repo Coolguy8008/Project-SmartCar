@@ -1,5 +1,6 @@
 #include <IRremote.h>
 #include <Arduino.h>
+#include <IRfunctions.h>
 #include <behaviours.h>
 
 typedef void (*FuncPtr)();
