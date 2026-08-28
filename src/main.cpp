@@ -17,18 +17,16 @@ void action0()
   myCar.Move(Forward, SPEED);
   delay(actionTime);
   myCar.Move(Stop, 0);
+  Serial.println("0 a");
 }
 void action1()
 {
-  Serial.println("1");
   myCar.Move(Backward, SPEED);
   delay(actionTime);
   myCar.Move(Stop, 0);
+  Serial.println("1");
 }
-void action2() {  Serial.println("1");
-  myCar.Move(clockWise, SPEED);
-  delay(actionTime);
-  myCar.Move(Stop, 0);}
+void action2() { Serial.println("2"); }
 void action3() { Serial.println("3"); }
 void action4() { Serial.println("4"); }
 void action5() { Serial.println("5"); }
