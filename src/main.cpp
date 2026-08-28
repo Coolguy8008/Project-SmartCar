@@ -4,29 +4,32 @@
 #include <behaviours.h>
 
 typedef void (*FuncPtr)();
-int actionTime = random(3,10)*1000;
+int actionTime = random(2,5)*1000;
 unsigned long lastCommandTime;            // Record the time of the last received command
 const unsigned long commandTimeout = 100; // Set the timeout period (milliseconds)
 uint32_t last_decode = 0;                 // Variable to store the previously decoded raw data
 uint32_t current_decode = 0;              // Variable to store the currently decoded raw data
 
 // IDLE SETUP
-void action0() { Serial.println("0");
+void action0()
+{
+ Serial.println("0");
   myCar.Move(Forward, SPEED);
   delay(actionTime);
-  myCar.Move(Stop, 0);}
-void action1() { Serial.println("1");
+  myCar.Move(Stop, 0);
+}
+void action1()
+{
+  Serial.println("1");
   myCar.Move(Backward, SPEED);
   delay(actionTime);
-  myCar.Move(Stop, 0);}
-void action2() { Serial.println("2");
-  myCar.Move(ClockWise, SPEED);
+  myCar.Move(Stop, 0);
+}
+void action2() {  Serial.println("1");
+  myCar.Move(clockWise, SPEED);
   delay(actionTime);
   myCar.Move(Stop, 0);}
-void action3() { Serial.println("3");
-  myCar.Move(antiClockWise, SPEED);
-  delay(actionTime);
-  myCar.Move(Stop, 0);}
+void action3() { Serial.println("3"); }
 void action4() { Serial.println("4"); }
 void action5() { Serial.println("5"); }
 void action6() { Serial.println("6"); }
@@ -227,15 +230,12 @@ void updateSensors()
   UT_distance = myUltrasonic.Ranging();
 }
 
-void updateAi(){
-   actionTime = random(3, 10)*1000;
-  Serial.println(actionTime);
-  int choice = random(0, 7); // Generates number 0 to 19
-  actions[choice](); 
-}
 void loop()
 {
-  updateAi();
+  actionTime = random(2, 5)*1000;
+  Serial.println(actionTime);
+  int choice = random(0, 7); // Generates number 0 to 19
+  actions[choice]();         // Call selected function
   updateSensors();
   checkDistance();
   handleIRrecieve();
