@@ -4,7 +4,7 @@
 #include <behaviours.h>
 
 typedef void (*FuncPtr)();
-int actionTime = random(2,5)*1000;
+int actionTime = random(2,5);
 unsigned long lastCommandTime;            // Record the time of the last received command
 const unsigned long commandTimeout = 100; // Set the timeout period (milliseconds)
 uint32_t last_decode = 0;                 // Variable to store the previously decoded raw data
@@ -22,8 +22,14 @@ void action1()
 {
   Serial.println("1");
   myCar.Move(Backward, SPEED);
+<<<<<<< HEAD
   delay(actionTime);
   myCar.Move(Stop, 0);
+=======
+ // delay(actionTime);
+  //myCar.Move(Stop, 0);
+  Serial.println("1");
+>>>>>>> parent of 440b3e3 (I'm an idiot)
 }
 void action2() {  Serial.println("1");
   myCar.Move(Clockwise, SPEED);
@@ -232,7 +238,7 @@ void updateSensors()
 
 void loop()
 {
-  actionTime = random(2, 5)*1000;
+  actionTime = random(2, 5);
   Serial.println(actionTime);
   int choice = random(0, 7); // Generates number 0 to 19
   actions[choice]();         // Call selected function
