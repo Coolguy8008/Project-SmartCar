@@ -68,6 +68,7 @@ void findLeft()
   // delay(500);
   myCar.Move(Stop, 0);
 }
+
 void findRight()
 {
   while (facingTarget == false)
@@ -137,8 +138,8 @@ void handleIRrecieve()
   if (recieveInstruction)
   {
     if (myIRrecv.decode())
-    {                             // Check if an IR signal is received
-      lastCommandTime = millis(); // Update the last command time
+    {                            
+      lastCommandTime = millis(); 
       current_decode = myIRrecv.decodedIRData.decodedRawData;
       if (myIRrecv.decodedIRData.flags)
       { // Check if it's a repeated IR code
@@ -244,6 +245,5 @@ void loop()
   checkDistance();
   handleIRrecieve();
   ledController();
-  Serial.println(SPEED);
   delay(250);
 }
