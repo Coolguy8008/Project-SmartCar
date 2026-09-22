@@ -5,9 +5,10 @@
 
 vehicle myCar;
 
-int SPEED = 200;
+int SPEED = 120;
 bool followState = false;
 bool manual = false;
+bool followingLine = false;
 
 void arrowLeft()
 {
@@ -50,7 +51,11 @@ void but1()
 }
 
 void but2()
-{
+{  
+    if ((followState == false) && (manual == false))
+    {
+        followingLine = !followingLine;
+    }
 }
 
 void but3()
@@ -77,16 +82,31 @@ void toggleManual()
     }
 }
 
-void speedUp(){
-    SPEED +=10;
-    if (SPEED > 250) {
-        SPEED = 250;
+void toggleLineFollow()
+{
+    if ((followState == false) && (manual == false))
+    {
+        followingLine = !followingLine;
+        myCar.Move(Stop,0);
     }
 }
 
-void speedDown(){
-    SPEED-=10;
-    if (SPEED < 110) {
-        SPEED = 110;
+void speedUp()
+{
+    SPEED += 10;
+    if (SPEED > 250)
+    {
+        SPEED = 250;
     }
+    Serial.println(SPEED);
+}
+
+void speedDown()
+{
+    SPEED -= 10;
+    if (SPEED < 120)
+    {
+        SPEED = 120;
+    }
+    Serial.println(SPEED);
 }

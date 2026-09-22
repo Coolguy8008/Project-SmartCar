@@ -5,14 +5,22 @@
 #include <ESP32Servo.h>
 #include <IRfunctions.h>
 
-#define IRpin 4
+#define IRpin 33
 #define leftLEDPin 2
 #define rightLEDPin 12
 #define buzzerPin 33
 #define servoPin 25
 #define sonarPin 14
 #define echoPin 15
+#define Left_sensor 35   // declare the pin of left tracking sensor
+#define Middle_sensor 36 // declare the pin of middle tracking sensor
+#define Right_sensor 39  // declare the pin of right tracking sensor
 
+int Left_Tra_Value;
+int Middle_Tra_Value;
+int Right_Tra_Value;
+int Black_Line = 2000;
+int RotateSpeed = 150;
 // FACE OBJECT VARIABLES
 int leftSide;
 int rightSide;
@@ -49,6 +57,9 @@ void setup()
   myUltrasonic.Init(13, 14);
   pinMode(leftLEDPin, OUTPUT);
   pinMode(rightLEDPin, OUTPUT);
+  pinMode(Left_sensor, INPUT);
+  pinMode(Middle_sensor, INPUT);
+  pinMode(Right_sensor, INPUT);
 }
 void findLeft()
 {
@@ -138,8 +149,8 @@ void handleIRrecieve()
   if (recieveInstruction)
   {
     if (myIRrecv.decode())
-    {                            
-      lastCommandTime = millis(); 
+    {
+      lastCommandTime = millis();
       current_decode = myIRrecv.decodedIRData.decodedRawData;
       if (myIRrecv.decodedIRData.flags)
       { // Check if it's a repeated IR code
@@ -190,11 +201,11 @@ void handleIRrecieve()
         break;
 
       case 0xF708FF00:
-        speedUp();
+        speedDown();
         break;
 
       case 0xA55AFF00:
-        speedDown();
+        speedUp();
         break;
       }
       last_decode = current_decode;
@@ -239,11 +250,54 @@ void checkDistance()
   }
 }
 
+void followLine()
+{
+  if (followingLine)
+  {
+    Serial.print("Left_Tra_Value ");
+    Serial.println(Left_Tra_Value);
+    Serial.print("Middle_Tra_Value ");
+    Serial.println(Middle_Tra_Value);
+    Serial.print("Right_Tra_Value ");
+    Serial.println(Right_Tra_Value);
+    SPEED = 120;
+    Left_Tra_Value = analogRead(Left_sensor);
+    Middle_Tra_Value = analogRead(Middle_sensor);
+    Right_Tra_Value = analogRead(Right_sensor);
+    delay(5);
+    if (Left_Tra_Value < Black_Line && Middle_Tra_Value >= Black_Line && Right_Tra_Value < Black_Line)
+    {
+      myCar.Move(Forward, SPEED); // Smart car forward
+    }
+    if (Left_Tra_Value < Black_Line && Middle_Tra_Value >= Black_Line && Right_Tra_Value >= Black_Line)
+    {
+      myCar.Move(Forward, 180);
+    }
+    if (Left_Tra_Value >= Black_Line && Middle_Tra_Value >= Black_Line && Right_Tra_Value < Black_Line)
+    {
+      myCar.Move(Forward, 180);
+    }
+    else if (Left_Tra_Value >= Black_Line && Middle_Tra_Value < Black_Line && Right_Tra_Value < Black_Line)
+    {
+      myCar.Move(Contrarotate, 220);
+    }
+    else if (Left_Tra_Value < Black_Line && Middle_Tra_Value < Black_Line && Right_Tra_Value >= Black_Line)
+    {
+      myCar.Move(Clockwise, 220);
+    }
+    else if (Left_Tra_Value >= Black_Line && Middle_Tra_Value >= Black_Line &&
+             Right_Tra_Value >= Black_Line)
+    {
+      myCar.Move(Forward, 180);
+    }
+  }
+}
 void loop()
 {
   UT_distance = myUltrasonic.Ranging();
   checkDistance();
   handleIRrecieve();
   ledController();
-  delay(250);
+  followLine();
+  delay(5);
 }
