@@ -5,7 +5,7 @@
 #include <ESP32Servo.h>
 #include <IRfunctions.h>
 
-#define IRpin 4 
+#define IRpin 4
 #define leftLEDPin 2
 #define rightLEDPin 12
 #define buzzerPin 33
@@ -37,6 +37,7 @@ uint32_t last_decode = 0;                 // Variable to store the previously de
 uint32_t current_decode = 0;              // Variable to store the currently decoded raw data
 
 int UT_distance = 0;
+int refreshSpeed = 500;
 bool recieveInstruction = true;
 // MOTOR TERMS (USE INSIDE OF "myCar.Move()") speed is out of 255
 //   Forward, [speed] & Backward [speed]
@@ -50,6 +51,7 @@ bool recieveInstruction = true;
 void setup()
 {
   Serial.begin(115200);
+  randomSeed(analogRead(A0));
   myIRrecv.enableIRIn();
   myCar.Init();
   myServo.attach(servoPin);
@@ -142,6 +144,30 @@ void findClosest()
     facingTarget = false;
   }
 }
+
+void refreshControler(){
+  if (manual){
+    refreshSpeed = 500;
+  }
+  else {
+    if (idle){
+      refreshSpeed = 1000;
+    }
+    else{
+      if (followingLine){
+        refreshSpeed = 5;
+      }
+      else{
+        if (followState){
+          refreshSpeed = 5;
+        }
+        else{
+          refreshSpeed = 1000;
+        }
+      }
+    }
+  }
+}
 // IR BUTTON FUNCTIONS
 
 void handleIRrecieve()
@@ -186,7 +212,7 @@ void handleIRrecieve()
         break;
 
       case 0xE619FF00:
-       myCar.Move(Stop,0);
+        myCar.Move(Stop, 0);
         but2();
         break;
 
@@ -222,6 +248,7 @@ void handleIRrecieve()
       myCar.Move(Stop, 0);
       // If no new IR signal within 100 milliseconds, stop the smart car
     }
+    refreshControler();
   }
 }
 void ledController()
@@ -265,7 +292,7 @@ void followLine()
     Serial.println(Middle_Tra_Value);
     Serial.print("Right_Tra_Value ");
     Serial.println(Right_Tra_Value);
-    SPEED = 120;
+    SPEED = 100;
     Left_Tra_Value = analogRead(Left_sensor);
     Middle_Tra_Value = analogRead(Middle_sensor);
     Right_Tra_Value = analogRead(Right_sensor);
@@ -275,33 +302,66 @@ void followLine()
     }
     if (Left_Tra_Value < Black_Line && Middle_Tra_Value >= Black_Line && Right_Tra_Value >= Black_Line)
     {
-      myCar.Move(Forward, 180);
+      myCar.Move(Forward, SPEED);
     }
     if (Left_Tra_Value >= Black_Line && Middle_Tra_Value >= Black_Line && Right_Tra_Value < Black_Line)
     {
-      myCar.Move(Forward, 180);
+      myCar.Move(Forward, SPEED);
     }
     else if (Left_Tra_Value >= Black_Line && Middle_Tra_Value < Black_Line && Right_Tra_Value < Black_Line)
     {
-      myCar.Move(Contrarotate, 220);
+      myCar.Move(Contrarotate, SPEED);
     }
     else if (Left_Tra_Value < Black_Line && Middle_Tra_Value < Black_Line && Right_Tra_Value >= Black_Line)
     {
-      myCar.Move(Clockwise, 220);
+      myCar.Move(Clockwise, SPEED);
     }
     else if (Left_Tra_Value >= Black_Line && Middle_Tra_Value >= Black_Line &&
              Right_Tra_Value >= Black_Line)
     {
-      myCar.Move(Forward, 180);
+      myCar.Move(Forward, SPEED);
     }
   }
+}
+
+// IDLE FUNCTIONS
+void patternOne()
+{
+  Serial.println("Running Pattern One: Flashing LEDs!");
+}
+
+void patternTwo()
+{
+  Serial.println("Running Pattern Two: Fading LEDs!");
+}
+
+void patternThree()
+{
+  Serial.println("Running Pattern Three: Strobe effect!");
+}
+
+void (*functionArray[3])() = {patternOne, patternTwo, patternThree};
+
+void randBehaviour()
+{
+  if (idle){
+  int randomIndex = random(0, 3);
+
+  Serial.print("Executing function at index: ");
+  Serial.println(randomIndex);
+
+  // 5. Call the randomly selected function from the array
+  functionArray[randomIndex]();
+}
 }
 void loop()
 {
   UT_distance = myUltrasonic.Ranging();
+  Serial.println(refreshSpeed);
   checkDistance();
   handleIRrecieve();
   ledController();
   followLine();
-  delay(5);
+ // randBehaviour();
+  delay(refreshSpeed);
 }

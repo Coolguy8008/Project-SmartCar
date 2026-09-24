@@ -9,7 +9,7 @@ int SPEED = 120;
 bool followState = false;
 bool manual = false;
 bool followingLine = false;
-bool idle;
+bool idle = false;
 
 void arrowLeft()
 {
@@ -69,6 +69,7 @@ void but3()
 
 void toggleFollow()
 {
+    myCar.Move(Stop, 0);
     if (manual == false)
     {
         followState = !followState;
@@ -77,6 +78,7 @@ void toggleFollow()
 
 void toggleManual()
 {
+    myCar.Move(Stop, 0);
     if (followState == false)
     {
         manual = !manual;
@@ -85,6 +87,7 @@ void toggleManual()
 
 void toggleLineFollow()
 {
+    myCar.Move(Stop, 0);
     if ((followState == false) && (manual == false))
     {
         followingLine = !followingLine;\
@@ -113,5 +116,5 @@ void speedDown()
 }
 
 void idleToggle(){
-    
+    idle = !idle;
 }
