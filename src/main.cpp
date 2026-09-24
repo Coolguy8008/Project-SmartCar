@@ -5,7 +5,7 @@
 #include <ESP32Servo.h>
 #include <IRfunctions.h>
 
-#define IRpin 33
+#define IRpin 4 
 #define leftLEDPin 2
 #define rightLEDPin 12
 #define buzzerPin 33
@@ -181,10 +181,12 @@ void handleIRrecieve()
         break;
 
       case 0xF20DFF00:
+
         but3();
         break;
 
       case 0xE619FF00:
+       myCar.Move(Stop,0);
         but2();
         break;
 
@@ -206,6 +208,9 @@ void handleIRrecieve()
 
       case 0xA55AFF00:
         speedUp();
+        break;
+      case 0xAD52FF00:
+        idleToggle();
         break;
       }
       last_decode = current_decode;
@@ -264,7 +269,6 @@ void followLine()
     Left_Tra_Value = analogRead(Left_sensor);
     Middle_Tra_Value = analogRead(Middle_sensor);
     Right_Tra_Value = analogRead(Right_sensor);
-    delay(5);
     if (Left_Tra_Value < Black_Line && Middle_Tra_Value >= Black_Line && Right_Tra_Value < Black_Line)
     {
       myCar.Move(Forward, SPEED); // Smart car forward

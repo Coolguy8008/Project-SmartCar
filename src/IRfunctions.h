@@ -9,6 +9,7 @@ int SPEED = 120;
 bool followState = false;
 bool manual = false;
 bool followingLine = false;
+bool idle;
 
 void arrowLeft()
 {
@@ -86,8 +87,8 @@ void toggleLineFollow()
 {
     if ((followState == false) && (manual == false))
     {
-        followingLine = !followingLine;
-        myCar.Move(Stop,0);
+        followingLine = !followingLine;\
+       
     }
 }
 
@@ -109,4 +110,8 @@ void speedDown()
         SPEED = 120;
     }
     Serial.println(SPEED);
+}
+
+void idleToggle(){
+    
 }
