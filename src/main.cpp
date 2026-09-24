@@ -20,7 +20,8 @@ int Left_Tra_Value;
 int Middle_Tra_Value;
 int Right_Tra_Value;
 int Black_Line = 2000;
-int RotateSpeed = 150;
+int currentTime;
+int behaviourTime;
 // FACE OBJECT VARIABLES
 int leftSide;
 int rightSide;
@@ -145,29 +146,32 @@ void findClosest()
   }
 }
 
-void refreshControler(){
-  if (manual){
+void refreshControler()
+{
+  if (manual)
+  {
     refreshSpeed = 500;
   }
-  else {
-    if (idle){
-      refreshSpeed = 1000;
+  else
+  {
+    if (followingLine)
+    {
+      refreshSpeed = 5;
     }
-    else{
-      if (followingLine){
+    else
+    {
+      if (followState)
+      {
         refreshSpeed = 5;
       }
-      else{
-        if (followState){
-          refreshSpeed = 5;
-        }
-        else{
-          refreshSpeed = 1000;
-        }
+      else
+      {
+        refreshSpeed = 1000;
       }
     }
   }
 }
+
 // IR BUTTON FUNCTIONS
 
 void handleIRrecieve()
@@ -292,7 +296,7 @@ void followLine()
     Serial.println(Middle_Tra_Value);
     Serial.print("Right_Tra_Value ");
     Serial.println(Right_Tra_Value);
-    SPEED = 100;
+    SPEED = 80;
     Left_Tra_Value = analogRead(Left_sensor);
     Middle_Tra_Value = analogRead(Middle_sensor);
     Right_Tra_Value = analogRead(Right_sensor);
@@ -302,66 +306,85 @@ void followLine()
     }
     if (Left_Tra_Value < Black_Line && Middle_Tra_Value >= Black_Line && Right_Tra_Value >= Black_Line)
     {
-      myCar.Move(Forward, SPEED);
+      myCar.Move(Forward, 180);
     }
     if (Left_Tra_Value >= Black_Line && Middle_Tra_Value >= Black_Line && Right_Tra_Value < Black_Line)
     {
-      myCar.Move(Forward, SPEED);
+      myCar.Move(Forward, 180);
     }
     else if (Left_Tra_Value >= Black_Line && Middle_Tra_Value < Black_Line && Right_Tra_Value < Black_Line)
     {
-      myCar.Move(Contrarotate, SPEED);
+      myCar.Move(Contrarotate, 220);
     }
     else if (Left_Tra_Value < Black_Line && Middle_Tra_Value < Black_Line && Right_Tra_Value >= Black_Line)
     {
-      myCar.Move(Clockwise, SPEED);
+      myCar.Move(Clockwise, 220);
     }
     else if (Left_Tra_Value >= Black_Line && Middle_Tra_Value >= Black_Line &&
              Right_Tra_Value >= Black_Line)
     {
-      myCar.Move(Forward, SPEED);
+      myCar.Move(Forward, 180);
     }
   }
 }
 
 // IDLE FUNCTIONS
-void patternOne()
+void behaviourOne()
 {
-  Serial.println("Running Pattern One: Flashing LEDs!");
+  myCar.Move(Stop,0);
+  followState = true;
 }
 
-void patternTwo()
+void behaviourTwo()
 {
-  Serial.println("Running Pattern Two: Fading LEDs!");
+  myCar.Move(Clockwise, SPEED);
 }
 
-void patternThree()
+void behaviourThree()
 {
-  Serial.println("Running Pattern Three: Strobe effect!");
+  myCar.Move(antiClockwise, SPEED);
 }
 
-void (*functionArray[3])() = {patternOne, patternTwo, patternThree};
+void behaviourFour()
+{
+  digitalWrite(leftLEDPin, HIGH);
+  digitalWrite(rightLEDPin, HIGH);
+}
+
+void (*functionArray[4])() = {behaviourOne, behaviourTwo, behaviourThree, behaviourFour};
 
 void randBehaviour()
 {
-  if (idle){
-  int randomIndex = random(0, 3);
-
-  Serial.print("Executing function at index: ");
-  Serial.println(randomIndex);
-
-  // 5. Call the randomly selected function from the array
-  functionArray[randomIndex]();
-}
+  if (idle)
+  {
+    followState = false;
+    digitalWrite(leftLEDPin, LOW);
+    digitalWrite(rightLEDPin, LOW);
+    int randomIndex = random(0, 4);
+    behaviourTime = random(1000, 2000);
+    SPEED = random(120, 250);
+    Serial.print("Executing function at index: ");
+    Serial.println(randomIndex);
+    Serial.println(SPEED);
+    Serial.println(behaviourTime);
+    // 5. Call the randomly selected function from the array
+    functionArray[randomIndex]();
+    while (currentTime < behaviourTime)
+    {
+      checkDistance();
+      UT_distance = myUltrasonic.Ranging();
+      currentTime += 5;
+    }
+    currentTime = 0;
+  }
 }
 void loop()
 {
   UT_distance = myUltrasonic.Ranging();
-  Serial.println(refreshSpeed);
   checkDistance();
   handleIRrecieve();
   ledController();
   followLine();
- // randBehaviour();
+  randBehaviour();
   delay(refreshSpeed);
 }
