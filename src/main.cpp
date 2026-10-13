@@ -20,7 +20,7 @@ int Left_Tra_Value;
 int Middle_Tra_Value;
 int Right_Tra_Value;
 int Black_Line = 2000;
-int currentTime;
+float currentTime;
 int behaviourTime;
 // FACE OBJECT VARIABLES
 int leftSide;
@@ -180,6 +180,7 @@ void handleIRrecieve()
   {
     if (myIRrecv.decode())
     {
+      myCar.Move(Stop, 0);
       lastCommandTime = millis();
       current_decode = myIRrecv.decodedIRData.decodedRawData;
       if (myIRrecv.decodedIRData.flags)
@@ -252,6 +253,7 @@ void handleIRrecieve()
       myCar.Move(Stop, 0);
       // If no new IR signal within 100 milliseconds, stop the smart car
     }
+    delay(250);
     refreshControler();
   }
 }
@@ -329,39 +331,54 @@ void followLine()
 }
 
 // IDLE FUNCTIONS
-void behaviourOne()
+void behaviour1()
 {
-  myCar.Move(Stop,0);
   followState = true;
 }
 
-void behaviourTwo()
+void behaviour2()
 {
   myCar.Move(Clockwise, SPEED);
 }
 
-void behaviourThree()
+void behaviour3()
 {
   myCar.Move(antiClockwise, SPEED);
 }
 
-void behaviourFour()
+void behaviour4()
 {
   digitalWrite(leftLEDPin, HIGH);
   digitalWrite(rightLEDPin, HIGH);
 }
 
-void (*functionArray[4])() = {behaviourOne, behaviourTwo, behaviourThree, behaviourFour};
+void behaviour5()
+{
+  digitalWrite(leftLEDPin, HIGH);
+}
+
+void behaviour6()
+{
+  digitalWrite(rightLEDPin, HIGH);
+}
+void behaviour7()
+{
+  findClosest();
+}
+
+void (*functionArray[7])() = {behaviour1, behaviour2, behaviour3, behaviour4, behaviour5, behaviour6, behaviour7};
 
 void randBehaviour()
 {
   if (idle)
   {
     followState = false;
+    myCar.Move(Stop, 0);
+    myServo.write(90);
     digitalWrite(leftLEDPin, LOW);
     digitalWrite(rightLEDPin, LOW);
-    int randomIndex = random(0, 4);
-    behaviourTime = random(1000, 2000);
+    int randomIndex = random(0, 7);
+    behaviourTime = random(1, 3);
     SPEED = random(120, 250);
     Serial.print("Executing function at index: ");
     Serial.println(randomIndex);
@@ -372,8 +389,12 @@ void randBehaviour()
     while (currentTime < behaviourTime)
     {
       checkDistance();
+      handleIRrecieve();
+      Serial.println(currentTime);
+      Serial.println(behaviourTime);
       UT_distance = myUltrasonic.Ranging();
-      currentTime += 5;
+      currentTime += 0.5;
+      delay(500);
     }
     currentTime = 0;
   }
