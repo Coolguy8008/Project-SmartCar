@@ -35,17 +35,16 @@ void refreshControler()
     else
     {
 
-            if (followState)
-            {
-                refreshSpeed = 5;
-            }
-            else
-            {
-                refreshSpeed = 1000;
-            }
+        if (followState)
+        {
+            refreshSpeed = 5;
+        }
+        else
+        {
+            refreshSpeed = 1000;
         }
     }
-
+}
 
 void arrowLeft()
 {
@@ -89,7 +88,6 @@ void but1()
 
 void but2()
 {
-
 }
 
 void but3()
@@ -120,12 +118,11 @@ void toggleManual()
 
 void toggleLineFollow()
 {
-
 }
 
 void speedUp()
 {
-    SPEED += 10;
+    SPEED += 20;
     if (SPEED > 250)
     {
         SPEED = 250;
@@ -135,7 +132,7 @@ void speedUp()
 
 void speedDown()
 {
-    SPEED -= 10;
+    SPEED -= 20;
     if (SPEED < 120)
     {
         SPEED = 120;
@@ -201,7 +198,7 @@ void findClosest()
         Serial.println(" RIGHT");
         // FIND LEFT SIDE
         myServo.write(180);
-        delay(400);
+        delay(600);
         leftSide = myUltrasonic.Ranging();
         Serial.print(leftSide);
         Serial.println(" LEFT");
@@ -239,19 +236,16 @@ void checkDistance()
         if (UT_distance > 60)
         {
             myCar.Move(Forward, SPEED);
-            // tone(buzzerPin, 0);
         }
         else
         {
             if (UT_distance < 40)
             {
                 myCar.Move(Backward, SPEED);
-                // tone(buzzerPin, 0);
             }
             else
             {
                 myCar.Move(Stop, 0);
-                //  tone(buzzerPin, 262);
             }
         }
     }
@@ -337,7 +331,8 @@ void handleIRrecieve()
             myCar.Move(Stop, 0);
             // If no new IR signal within 100 milliseconds, stop the smart car
         }
-        delay(250);
+        if (followState)
+        {delay(250);}
         refreshControler();
     }
 }

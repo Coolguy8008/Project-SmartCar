@@ -51,8 +51,13 @@ void randBehaviour()
             Serial.println(behaviourTime);
             UT_distance = myUltrasonic.Ranging();
             currentTime += 0.5;
+            digitalWrite(leftLEDPin, HIGH);
+            digitalWrite(rightLEDPin, HIGH);
             delay(500);
+            digitalWrite(leftLEDPin, LOW);
+            digitalWrite(rightLEDPin, LOW);
         }
-        currentTime = 0;
+        currentTime = 0;     
+
     }
 }
