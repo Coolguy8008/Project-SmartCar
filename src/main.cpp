@@ -48,6 +48,8 @@ void ledController()
 void loop()
 {
   UT_distance = myUltrasonic.Ranging();
+  Serial.print("Idle State = ");
+  Serial.println(idle);
   checkDistance();
   handleIRrecieve();
   ledController();

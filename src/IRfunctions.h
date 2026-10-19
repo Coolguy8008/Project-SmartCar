@@ -116,10 +116,6 @@ void toggleManual()
     }
 }
 
-void toggleLineFollow()
-{
-}
-
 void speedUp()
 {
     SPEED += 20;
@@ -142,6 +138,7 @@ void speedDown()
 
 void idleToggle()
 {
+    followState = false;
     idle = !idle;
 }
 
@@ -229,27 +226,6 @@ void findClosest()
     }
 }
 
-void checkDistance()
-{
-    if (followState == true)
-    {
-        if (UT_distance > 60)
-        {
-            myCar.Move(Forward, SPEED);
-        }
-        else
-        {
-            if (UT_distance < 40)
-            {
-                myCar.Move(Backward, SPEED);
-            }
-            else
-            {
-                myCar.Move(Stop, 0);
-            }
-        }
-    }
-}
 
 void handleIRrecieve()
 {
@@ -257,6 +233,7 @@ void handleIRrecieve()
     {
         if (myIRrecv.decode())
         {
+
             myCar.Move(Stop, 0);
             myServo.write(90);
             lastCommandTime = millis();
@@ -300,17 +277,24 @@ void handleIRrecieve()
                 break;
 
             case 0xBD42FF00:
-                findClosest();
-                break;
-
+                if ((manual == false) && (followState == false) && (idle == false))
+                {
+                    findClosest();
+                    break;
+                }
             case 0xB54AFF00:
-                toggleFollow();
-                break;
+                if ((manual == false) && (idle == false))
+                {
+                    toggleFollow();
+                    break;
+                }
 
             case 0xBF40FF00:
-                toggleManual();
-                break;
-
+                if ((idle == false) && (followState == false))
+                {
+                    toggleManual();
+                    break;
+                }
             case 0xF708FF00:
                 speedDown();
                 break;
@@ -319,8 +303,11 @@ void handleIRrecieve()
                 speedUp();
                 break;
             case 0xAD52FF00:
-                idleToggle();
-                break;
+                if ((manual == false) && (followState == false))
+                {
+                    idleToggle();
+                    break;
+                }
             }
             last_decode = current_decode;
             // Update the stored previous decodedRawData
@@ -332,7 +319,32 @@ void handleIRrecieve()
             // If no new IR signal within 100 milliseconds, stop the smart car
         }
         if (followState)
-        {delay(250);}
+        {
+            delay(250);
+        }
         refreshControler();
+    }
+}
+
+void checkDistance()
+{  
+    handleIRrecieve();
+    if (followState == true)
+    {
+        if (UT_distance > 60)
+        {
+            myCar.Move(Forward, SPEED);
+        }
+        else
+        {
+            if (UT_distance < 40)
+            {
+                myCar.Move(Backward, SPEED);
+            }
+            else
+            {
+                myCar.Move(Stop, 0);
+            }
+        }
     }
 }

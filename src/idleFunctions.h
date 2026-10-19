@@ -6,10 +6,12 @@
 float currentTime;
 int behaviourTime;
 
+
+
 // IDLE FUNCTIONS
 void behaviour1()
 {
-    followState = true;
+    myCar.Move(Forward, SPEED);
 }
 
 void behaviour2()
@@ -45,17 +47,14 @@ void randBehaviour()
 
         while (currentTime < behaviourTime)
         {
-            checkDistance();
+            Serial.print("Idle State = ");
+            Serial.println(idle);
             handleIRrecieve();
             Serial.println(currentTime);
             Serial.println(behaviourTime);
             UT_distance = myUltrasonic.Ranging();
             currentTime += 0.5;
-            digitalWrite(leftLEDPin, HIGH);
-            digitalWrite(rightLEDPin, HIGH);
             delay(500);
-            digitalWrite(leftLEDPin, LOW);
-            digitalWrite(rightLEDPin, LOW);
         }
         currentTime = 0;     
 
