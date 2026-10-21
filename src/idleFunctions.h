@@ -2,61 +2,73 @@
 
 #define leftLEDPin 2
 #define rightLEDPin 12
+#define crashPin 34
 
+int crashState;
 float currentTime;
 int behaviourTime;
 
-
-
 // IDLE FUNCTIONS
-void behaviour1()
+void forward()
 {
+    lcd.print(__func__);
+
     myCar.Move(Forward, SPEED);
 }
 
-void behaviour2()
+void right()
 {
+    lcd.print(__func__);
+
     myCar.Move(Clockwise, SPEED);
 }
 
-void behaviour3()
+void left()
 {
+    lcd.print(__func__);
+
     myCar.Move(antiClockwise, SPEED);
 }
 
-void (*functionArray[7])() = {behaviour1, behaviour1, behaviour1, behaviour2, behaviour2, behaviour3, behaviour3};
+void (*functionArray[6])() = {forward, forward, right, right, left, left};
 
 void randBehaviour()
 {
     if (idle)
     {
-        followState = false;
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Chosen Behaviour: ");
+        lcd.setCursor(0, 1);
         myCar.Move(Stop, 0);
-        myServo.write(90);
+        currentTime = 0;
         digitalWrite(leftLEDPin, LOW);
         digitalWrite(rightLEDPin, LOW);
-        int randomIndex = random(0, 6);
+        int randomIndex = random(0, 5);
         behaviourTime = random(1, 3);
         SPEED = random(120, 250);
-        Serial.print("Executing function at index: ");
-        Serial.println(randomIndex);
-        Serial.println(SPEED);
-        Serial.println(behaviourTime);
+
         // 5. Call the randomly selected function from the array
         functionArray[randomIndex]();
 
         while (currentTime < behaviourTime)
         {
-            Serial.print("Idle State = ");
-            Serial.println(idle);
-            handleIRrecieve();
-            Serial.println(currentTime);
-            Serial.println(behaviourTime);
-            UT_distance = myUltrasonic.Ranging();
-            currentTime += 0.5;
-            delay(500);
+            crashState = digitalRead(crashPin);
+            if (crashState == LOW)
+            {
+                myCar.Move(Backward, 250);
+                delay(1000);
+                myCar.Move(Stop, 0);
+                randBehaviour();
+            }
+            else
+            {
+                handleIRrecieve();
+                UT_distance = myUltrasonic.Ranging();
+                currentTime += 0.1;
+                delay(100);
+            }
         }
-        currentTime = 0;     
-
+        currentTime = 0;
     }
 }

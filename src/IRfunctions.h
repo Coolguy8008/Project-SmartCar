@@ -1,14 +1,18 @@
 #include <Arduino.h>
 #include <vehicle.h>
+#include <LiquidCrystal_I2C.h>
 #define antiClockwise Contrarotate
 #define buzzerPin 33
 #define IRpin 4
-
+LiquidCrystal_I2C lcd(0x3F, 16, 2);
 vehicle myCar;
 IRrecv myIRrecv(IRpin);
 ultrasonic myUltrasonic;
 Servo myServo;
-
+int Left_Tra_Value;
+int Middle_Tra_Value;
+int Right_Tra_Value;
+int Black_Line = 2000;
 int UT_distance = 0;
 int SPEED = 120;
 bool followState = false;
@@ -20,7 +24,7 @@ int leftSide;
 int rightSide;
 int target;
 bool facingTarget = false;
-
+bool followingLine = false;
 unsigned long lastCommandTime;            // Record the time of the last received command
 const unsigned long commandTimeout = 100; // Set the timeout period (milliseconds)
 uint32_t last_decode = 0;                 // Variable to store the previously decoded raw data
@@ -48,6 +52,8 @@ void refreshControler()
 
 void arrowLeft()
 {
+    lcd.print(__func__);
+
     if (manual)
     {
         myCar.Move(antiClockwise, SPEED);
@@ -56,6 +62,8 @@ void arrowLeft()
 
 void arrowRight()
 {
+    lcd.print(__func__);
+
     if (manual)
     {
         myCar.Move(Clockwise, SPEED);
@@ -64,6 +72,8 @@ void arrowRight()
 
 void arrowUp()
 {
+    lcd.print(__func__);
+
     if (manual)
     {
         myCar.Move(Forward, SPEED);
@@ -72,6 +82,8 @@ void arrowUp()
 
 void arrowDown()
 {
+    lcd.print(__func__);
+
     if (manual)
     {
         myCar.Move(Backward, SPEED);
@@ -80,6 +92,8 @@ void arrowDown()
 
 void but1()
 {
+    lcd.print(__func__);
+
     if (manual)
     {
         myCar.Move(Move_Left, SPEED);
@@ -88,10 +102,15 @@ void but1()
 
 void but2()
 {
+    lcd.print(__func__);
+
+    followingLine = !followingLine;
 }
 
 void but3()
 {
+    lcd.print(__func__);
+
     if (manual)
     {
         myCar.Move(Move_Right, SPEED);
@@ -100,6 +119,8 @@ void but3()
 
 void toggleFollow()
 {
+    lcd.print(__func__);
+
     myCar.Move(Stop, 0);
     if (manual == false)
     {
@@ -109,6 +130,7 @@ void toggleFollow()
 
 void toggleManual()
 {
+    lcd.print(__func__);
     myCar.Move(Stop, 0);
     if (followState == false)
     {
@@ -118,6 +140,10 @@ void toggleManual()
 
 void speedUp()
 {
+        lcd.print(__func__);
+        lcd.print("(");
+lcd.print(SPEED);
+        lcd.print(")");
     SPEED += 20;
     if (SPEED > 250)
     {
@@ -128,6 +154,10 @@ void speedUp()
 
 void speedDown()
 {
+        lcd.print(__func__);
+                lcd.print("(");
+lcd.print(SPEED);
+        lcd.print(")");
     SPEED -= 20;
     if (SPEED < 120)
     {
@@ -138,6 +168,7 @@ void speedDown()
 
 void idleToggle()
 {
+    lcd.print(__func__);
     followState = false;
     idle = !idle;
 }
@@ -180,12 +211,12 @@ void findRight()
     myCar.Move(Stop, 0);
 }
 
-// IR BUTTON FUNCTIONS
-
 void findClosest()
 {
     if ((followState == false) & (manual == false))
     {
+        lcd.print(__func__);
+
         // FIND RIGHT DISTANCE
         recieveInstruction = false;
         myServo.write(0);
@@ -226,6 +257,27 @@ void findClosest()
     }
 }
 
+void checkDistance()
+{
+    if (followState == true)
+    {
+        if (UT_distance > 60)
+        {
+            myCar.Move(Forward, SPEED);
+        }
+        else
+        {
+            if (UT_distance < 40)
+            {
+                myCar.Move(Backward, SPEED);
+            }
+            else
+            {
+                myCar.Move(Stop, 0);
+            }
+        }
+    }
+}
 
 void handleIRrecieve()
 {
@@ -233,7 +285,10 @@ void handleIRrecieve()
     {
         if (myIRrecv.decode())
         {
-
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Running Function:");
+            lcd.setCursor(0, 1);
             myCar.Move(Stop, 0);
             myServo.write(90);
             lastCommandTime = millis();
@@ -323,28 +378,5 @@ void handleIRrecieve()
             delay(250);
         }
         refreshControler();
-    }
-}
-
-void checkDistance()
-{  
-    handleIRrecieve();
-    if (followState == true)
-    {
-        if (UT_distance > 60)
-        {
-            myCar.Move(Forward, SPEED);
-        }
-        else
-        {
-            if (UT_distance < 40)
-            {
-                myCar.Move(Backward, SPEED);
-            }
-            else
-            {
-                myCar.Move(Stop, 0);
-            }
-        }
     }
 }
