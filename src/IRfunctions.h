@@ -179,7 +179,7 @@ void findLeft()
     {
 
         UT_distance = myUltrasonic.Ranging();
-        myCar.Move(antiClockwise, 200);
+        myCar.Move(antiClockwise, 120);
         Serial.println(UT_distance);
         if (target - 3 <= UT_distance && target + 3 >= UT_distance)
         {
@@ -198,7 +198,7 @@ void findRight()
     {
 
         UT_distance = myUltrasonic.Ranging();
-        myCar.Move(Clockwise, 200);
+        myCar.Move(Clockwise, 120);
         Serial.println(UT_distance);
         if (target - 3 <= UT_distance && target + 3 >= UT_distance)
         {
