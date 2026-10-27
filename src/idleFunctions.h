@@ -30,7 +30,7 @@ void left()
     myCar.Move(antiClockwise, SPEED);
 }
 
-void (*functionArray[6])() = {forward, forward, right, right, left, left};
+void (*functionArray[4])() = {forward, right, left, forward};
 
 void randBehaviour()
 {
@@ -44,7 +44,7 @@ void randBehaviour()
         currentTime = 0;
         digitalWrite(leftLEDPin, LOW);
         digitalWrite(rightLEDPin, LOW);
-        int randomIndex = random(0, 5);
+        int randomIndex = random(0, 3);
         behaviourTime = random(1, 3);
         SPEED = random(120, 250);
 
