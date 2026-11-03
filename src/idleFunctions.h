@@ -57,6 +57,7 @@ void randBehaviour()
             if (crashState == LOW)
             {
                 myCar.Move(Backward, 250);
+                lcd.print("CRASH!!");
                 delay(1000);
                 myCar.Move(Stop, 0);
                 randBehaviour();
