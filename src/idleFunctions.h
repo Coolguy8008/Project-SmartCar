@@ -56,6 +56,8 @@ void randBehaviour()
             crashState = digitalRead(crashPin);
             if (crashState == LOW)
             {
+                lcd.clear();
+                lcd.setCursor(0,1);
                 myCar.Move(Backward, 250);
                 lcd.print("CRASH!!");
                 delay(1000);
